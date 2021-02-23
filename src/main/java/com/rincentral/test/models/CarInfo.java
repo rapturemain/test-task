@@ -1,8 +1,17 @@
 package com.rincentral.test.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class CarInfo {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CarInfo implements CarInfoI {
     @JsonProperty("id")
     private Integer id;
 
@@ -23,4 +32,37 @@ public class CarInfo {
 
     @JsonProperty("modification")
     private String modification;
+
+    @JsonIgnore
+    private CarFullInfo fullInfo;
+
+    @JsonIgnore
+    @Override
+    public Integer getEngineDisplacement() {
+        return fullInfo.getEngineDisplacement();
+    }
+
+    @JsonIgnore
+    @Override
+    public Integer getHP() {
+        return fullInfo.getHP();
+    }
+
+    @JsonIgnore
+    @Override
+    public Integer getStartYear() {
+        return fullInfo.getStartYear();
+    }
+
+    @JsonIgnore
+    @Override
+    public Integer getEndYear() {
+        return fullInfo.getEndYear();
+    }
+
+    @JsonIgnore
+    @Override
+    public String getBodyStyle() {
+        return fullInfo.getBodyStyle();
+    }
 }

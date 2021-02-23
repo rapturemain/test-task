@@ -3,6 +3,7 @@ package com.rincentral.test.services;
 import com.rincentral.test.models.external.ExternalBrand;
 import com.rincentral.test.models.external.ExternalCar;
 import com.rincentral.test.models.external.ExternalCarInfo;
+import com.rincentral.test.models.external.page.Page;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +22,7 @@ public class ExternalCarsApiService {
     private static final Logger LOGGER = LogManager.getLogger(ExternalCarsApiService.class);
 
     private static final String ALL_CARS_URL = "http://localhost:8084/api/v1/cars";
+    private static final String ALL_CARS_PAGED_URL = "http://localhost:8084/api/v1/cars/paged?page=%d";
     private static final String CAR_BY_ID_URL = "http://localhost:8084/api/v1/cars/%d";
     private static final String ALL_BRANDS_URL = "http://localhost:8084/api/v1/brands";
     private final RestTemplate restTemplate = new RestTemplate();
@@ -31,6 +34,30 @@ public class ExternalCarsApiService {
                 return Collections.emptyList();
             }
             return Arrays.asList(allCarsResponse.getBody());
+        } catch (RestClientException restClientException) {
+            LOGGER.error("Error when trying to load all cars", restClientException);
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ExternalCar> loadAllCarsPaged() {
+        List<ExternalCar> cars = new ArrayList<>();
+        int page = 0;
+        try {
+            while (true) {
+                ResponseEntity<Page> allCarsResponse = restTemplate.getForEntity(
+                        String.format(ALL_CARS_PAGED_URL, page), Page.class);
+                if (allCarsResponse.getStatusCode() != HttpStatus.OK || allCarsResponse.getBody() == null) {
+                    return cars;
+                }
+                Page p = allCarsResponse.getBody();
+                cars.addAll(Arrays.asList(p.getCars()));
+                if (p.getLast() == null || p.getLast()) {
+                    return cars;
+                } else {
+                    page++;
+                }
+            }
         } catch (RestClientException restClientException) {
             LOGGER.error("Error when trying to load all cars", restClientException);
             return Collections.emptyList();
