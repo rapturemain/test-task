@@ -165,8 +165,8 @@ public class ApiController {
             }
             res = averageSpeedModel.get(requestParameters.getModel());
         }
-        if (requestParameters.getModel() != null) {
-            if (averageSpeedModel == null) {
+        if (requestParameters.getBrand() != null) {
+            if (averageSpeedBrand == null) {
                 Map<String, AverageSpeedCalculatorPair> map = new HashMap<>();
                 carInfoProviderService.getCarsFullInfo().forEach(it -> {
                     if (!map.containsKey(it.getBrand().getTitle())) {
